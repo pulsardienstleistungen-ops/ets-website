@@ -24,34 +24,22 @@
   --font-body: var(--font-inter), "Inter", sans-serif;
 }
 
-body {
-  font-family: var(--font-body);
-  color: var(--color-content);
-  background: #ffffff;
-}
+@layer base {
+  body {
+    font-family: var(--font-body);
+    color: var(--color-content);
+    background: #ffffff;
+  }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-  color: var(--color-charcoal);
-  letter-spacing: -0.02em;
-}
-
-/* Override heading color when inside dark sections */
-.hero-gradient h1,
-.hero-gradient h2,
-.hero-gradient h3,
-.bg-navy h1,
-.bg-navy h2,
-.bg-navy h3,
-[class*="bg-navy"] h1,
-[class*="bg-navy"] h2,
-[class*="bg-navy"] h3 {
-  color: #ffffff;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    color: var(--color-charcoal);
+    letter-spacing: -0.02em;
+  }
 }
 
 .hero-gradient {
   background: linear-gradient(135deg, #0F1B2D 0%, #1E3A5F 50%, #0F1B2D 100%);
-  color: #ffffff;
 }
 
 @keyframes marquee {

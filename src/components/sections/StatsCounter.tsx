@@ -1,11 +1,20 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useReducedMotion, useInView } from "framer-motion";
 import { content } from "@/data/content";
 import { useCountUp } from "@/hooks/useCountUp";
 import { staggerContainer, staggerItem } from "@/lib/animations";
 
-function StatItem({ value, label }: { value: string; label: string }) {
+function StatItem({
+  value,
+  label,
+  inView,
+}: {
+  value: string;
+  label: string;
+  inView: boolean;
+}) {
   const isStatic = value.includes("/");
   const hasSuffix = value.endsWith("+");
   const hasSeparator = value.includes(".");
@@ -15,19 +24,17 @@ function StatItem({ value, label }: { value: string; label: string }) {
   const suffix = hasSuffix ? "+" : "";
   const separator = hasSeparator ? "." : "";
 
-  const { ref, display } = useCountUp({
+  const display = useCountUp({
     end: isStatic ? 0 : numericValue,
     suffix,
     separator,
     duration: 2000,
+    start: inView,
   });
 
   return (
     <div className="text-center">
-      <span
-        ref={ref}
-        className="block font-heading font-extrabold text-5xl sm:text-6xl lg:text-[5rem] text-primary leading-none tabular-nums"
-      >
+      <span className="block font-heading font-extrabold text-5xl sm:text-6xl lg:text-[5rem] text-primary leading-none tabular-nums">
         {isStatic ? value : display}
       </span>
       <span className="block mt-3 text-sm sm:text-base text-white/70 font-medium">
@@ -40,9 +47,15 @@ function StatItem({ value, label }: { value: string; label: string }) {
 export function StatsCounter() {
   const items = content.stats;
   const shouldReduceMotion = useReducedMotion();
+  const sectionRef = useRef(null);
+  const inView = useInView(sectionRef, { once: true, margin: "-80px" });
 
   return (
-    <section className="bg-navy py-16 lg:py-24" aria-label="Unternehmenszahlen">
+    <section
+      ref={sectionRef}
+      className="bg-navy py-16 lg:py-24"
+      aria-label="Unternehmenszahlen"
+    >
       <motion.div
         {...(shouldReduceMotion
           ? {}
@@ -59,7 +72,7 @@ export function StatsCounter() {
             key={item.value}
             variants={shouldReduceMotion ? undefined : staggerItem}
           >
-            <StatItem value={item.value} label={item.label} />
+            <StatItem value={item.value} label={item.label} inView={inView} />
           </motion.div>
         ))}
       </motion.div>

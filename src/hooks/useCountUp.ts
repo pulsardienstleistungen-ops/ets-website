@@ -7,14 +7,20 @@ interface UseCountUpOptions {
   duration?: number;
   suffix?: string;
   separator?: string;
+  start?: boolean;
 }
 
 function easeOutCubic(t: number): number {
   return 1 - Math.pow(1 - t, 3);
 }
 
-export function useCountUp({ end, duration = 2000, suffix = "", separator = "" }: UseCountUpOptions) {
-  const ref = useRef<HTMLSpanElement>(null);
+export function useCountUp({
+  end,
+  duration = 2000,
+  suffix = "",
+  separator = "",
+  start = false,
+}: UseCountUpOptions) {
   const [display, setDisplay] = useState(`0${suffix}`);
   const hasAnimated = useRef(false);
 
@@ -35,42 +41,33 @@ export function useCountUp({ end, duration = 2000, suffix = "", separator = "" }
   );
 
   useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
+    if (!start || hasAnimated.current || end === 0) return;
 
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     if (prefersReducedMotion) {
       setDisplay(formatNumber(end));
+      hasAnimated.current = true;
       return;
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (entry.isIntersecting && !hasAnimated.current) {
-          hasAnimated.current = true;
-          let startTime: number | null = null;
+    hasAnimated.current = true;
+    let startTime: number | null = null;
 
-          const step = (timestamp: number) => {
-            if (!startTime) startTime = timestamp;
-            const elapsed = timestamp - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const value = easeOutCubic(progress) * end;
-            setDisplay(formatNumber(value));
-            if (progress < 1) {
-              requestAnimationFrame(step);
-            }
-          };
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const value = easeOutCubic(progress) * end;
+      setDisplay(formatNumber(value));
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      }
+    };
 
-          requestAnimationFrame(step);
-        }
-      },
-      { threshold: 0.3 },
-    );
+    requestAnimationFrame(step);
+  }, [start, end, duration, formatNumber]);
 
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [end, duration, formatNumber]);
-
-  return { ref, display };
+  return display;
 }
