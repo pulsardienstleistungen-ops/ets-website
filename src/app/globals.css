@@ -46,11 +46,12 @@ h1, h2, h3, h4, h5, h6 {
 [class*="bg-navy"] h1,
 [class*="bg-navy"] h2,
 [class*="bg-navy"] h3 {
-  color: inherit;
+  color: #ffffff;
 }
 
 .hero-gradient {
   background: linear-gradient(135deg, #0F1B2D 0%, #1E3A5F 50%, #0F1B2D 100%);
+  color: #ffffff;
 }
 
 @keyframes marquee {
